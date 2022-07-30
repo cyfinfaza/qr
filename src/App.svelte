@@ -2,7 +2,8 @@
   import QRCode from "qrcode-svg";
   var svgContent = "";
   var svgCode = "";
-  $: svgCode = svgContent.length > 0 && new QRCode({ content: svgContent }).svg();
+  var ecl = "L";
+  $: svgCode = svgContent.length > 0 && new QRCode({ content: svgContent, ecl }).svg();
   async function shareQr() {
     const blob = new Blob([svgCode], { type: "image/svg+xml" });
     const filesArray = [new File([blob], "qrcode.svg", { type: "image/svg+xml" })];
@@ -20,6 +21,15 @@
     <p>right click or press and hold on the qr code to save it as an svg</p>
     <button on:click={(_) => shareQr()}>share</button>
   {/if}
+  <div>
+    error correction level:
+    <select bind:value={ecl}>
+      <option value="L">low</option>
+      <option value="M">medium</option>
+      <option value="Q">q</option>
+      <option value="H">high</option>
+    </select>
+  </div>
 </main>
 
 <style>
