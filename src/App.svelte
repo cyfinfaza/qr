@@ -1,9 +1,10 @@
 <script>
   import QRCode from "qrcode-svg";
+  import { onMount } from "svelte";
+  import { eclMode } from "./stores";
   var svgContent = "";
   var svgCode = "";
-  var ecl = "L";
-  $: svgCode = svgContent.length > 0 && new QRCode({ content: svgContent, ecl }).svg();
+  $: svgCode = svgContent.length > 0 && new QRCode({ content: svgContent, ecl: $eclMode }).svg();
   async function shareQr() {
     const blob = new Blob([svgCode], { type: "image/svg+xml" });
     const filesArray = [new File([blob], "qrcode.svg", { type: "image/svg+xml" })];
@@ -12,6 +13,16 @@
     };
     navigator.share(shareData);
   }
+  onMount(() => {
+    // get data from url hash if it exists or the ?data param
+    const urlParams = new URLSearchParams(window.location.search);
+    const data = urlParams.get("data");
+    if (data) {
+      svgContent = data;
+    } else if (window.location.hash.length > 0) {
+      svgContent = window.location.hash.slice(1);
+    }
+  });
 </script>
 
 <main>
@@ -23,7 +34,7 @@
   {/if}
   <div>
     error correction level:
-    <select bind:value={ecl}>
+    <select bind:value={$eclMode}>
       <option value="L">low</option>
       <option value="M">medium</option>
       <option value="Q">q</option>
